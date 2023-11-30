@@ -6,6 +6,7 @@ import com.ecommerce.application.service.impl.OrderApplicationServiceImpl;
 import com.ecommerce.domain.ports.in.OrderRepositoryPort;
 import com.ecommerce.domain.ports.in.ProductRepositoryPort;
 import com.ecommerce.domain.ports.out.OrderService;
+import com.ecommerce.infrastructure.aws.SQSProducerMessage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +20,8 @@ public class SpringConfig {
         return new OrderRepository(orderRepository,productRepository);
     }
     @Bean
-    public OrderService orderService(OrderRepository orderService, OrderFactory orderFactory) {
-        return new OrderApplicationServiceImpl(orderService, orderFactory);
+    public OrderService orderService(OrderRepository orderService, OrderFactory orderFactory, SQSProducerMessage sqsProducerMessage) {
+        return new OrderApplicationServiceImpl(orderService, orderFactory, sqsProducerMessage);
     }
     @Bean
     public OrderFactory orderFactory() {

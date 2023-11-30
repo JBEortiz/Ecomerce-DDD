@@ -7,6 +7,9 @@ import com.ecommerce.domain.ports.out.OrderService;
 import com.ecommerce.domain.model.*;
 import com.ecommerce.application.repository.OrderRepository;
 import com.ecommerce.application.factory.OrderFactory;
+import com.ecommerce.infrastructure.aws.SQSProducerMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.util.List;
 
 public class OrderApplicationServiceImpl implements OrderService {
@@ -15,10 +18,13 @@ public class OrderApplicationServiceImpl implements OrderService {
 
     private final OrderFactory orderFactory;
 
+    private final SQSProducerMessage sqsProducerMessage;
 
-    public OrderApplicationServiceImpl(OrderRepository orderService,OrderFactory orderFactory) {
+
+    public OrderApplicationServiceImpl(OrderRepository orderService, OrderFactory orderFactory, SQSProducerMessage sqsProducerMessage) {
         this.orderService = orderService;
         this.orderFactory = orderFactory;
+        this.sqsProducerMessage = sqsProducerMessage;
     }
 
     @Override
@@ -28,7 +34,7 @@ public class OrderApplicationServiceImpl implements OrderService {
     }
 
     @Override
-    public CreateOrderReponseDTO createOrder(CreateOrderDTO createOrderDTO) {
+    public CreateOrderReponseDTO createOrder(CreateOrderDTO createOrderDTO) throws JsonProcessingException {
         //tranformar con mappstruct
         List<OrderLine> orderLines = orderFactory.createOrderLineDomain(createOrderDTO.getOrderLines());
         CustomerId customerId = new CustomerId(createOrderDTO.getCustomerId());
@@ -36,7 +42,7 @@ public class OrderApplicationServiceImpl implements OrderService {
         Order order = orderService.createOrder(customerId, orderLines);
 
         List<OrderLineDTO> orderLinesDto = orderFactory.createOrderLineDto(order.getOrderLines());
-
+        sqsProducerMessage.sendCreateOrderMessage(orderLinesDto);
         return CreateOrderReponseDTO.builder()
                 .orderLines(orderLinesDto)
                 .id(order.getId().getValue())

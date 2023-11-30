@@ -4,6 +4,7 @@ import com.ecommerce.application.dto.CreateOrderDTO;
 import com.ecommerce.application.dto.responses.CreateOrderReponseDTO;
 import com.ecommerce.domain.ports.out.OrderService;
 import com.ecommerce.domain.model.Order;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public CreateOrderReponseDTO createOrder(@RequestBody CreateOrderDTO createOrderDTO) {
+    public CreateOrderReponseDTO createOrder(@RequestBody CreateOrderDTO createOrderDTO) throws JsonProcessingException {
         return orderApplicationService.createOrder(createOrderDTO);
     }
 

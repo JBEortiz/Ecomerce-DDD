@@ -1,0 +1,10 @@
+cloud:
+  aws:
+    region:
+      static: eu-north-1
+      auto: false
+    credentials:
+      access-key: AKIAQDHL2WL6XXCQQRV7
+      secret-key: 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
+    end-point:
+      uri: https://sqs.eu-north-1.amazonaws.com/006937031421/java-queue
