@@ -8,6 +8,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
@@ -25,7 +27,12 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public Order getOrder(@PathVariable Long id) {
+    public Order getOrder(@PathVariable Long id) throws JsonProcessingException {
         return orderApplicationService.getOrderById(id);
+    }
+
+    @GetMapping("/all")
+    public List<Order> getOrder() {
+        return orderApplicationService.getAll();
     }
 }

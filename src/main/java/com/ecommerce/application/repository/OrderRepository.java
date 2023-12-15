@@ -35,4 +35,7 @@ public class OrderRepository {
     }
 
 
+    public List<Order> findAll() {
+       return orderRepository.findAll();
+    }
 }

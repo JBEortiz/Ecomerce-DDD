@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -55,5 +56,27 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
         }).toList();
         return Order.builder().id(orderIdDomain).orderLines(listOrderLine).customerId(customerId).status(entity.getStatus()).build();
 
+    }
+
+    @Override
+    public List<Order> findAll() {
+        List<OrderEntity>orderLineEntities = orderJpaRepository.findAll();
+
+        List<Order> orderDomainList = orderLineEntities.stream().map(orderEntity ->
+        {
+
+            CustomerId customerId = new CustomerId(orderEntity.getCustomerId());
+            OrderId orderIdDomain = new OrderId(orderEntity.getId());
+            List<OrderLine> listOrderLine = orderEntity.getOrderLines().stream().map(orderLineEntity -> {
+                ProductId productId = new ProductId(orderLineEntity.getProductId());
+                return OrderLine.builder()
+                        .price(orderLineEntity.getPrice())
+                        .quantity(orderLineEntity.getQuantity())
+                        .productId(productId).build();
+            }).toList();
+            return Order.builder().id(orderIdDomain).orderLines(listOrderLine).status(orderEntity.getStatus()).customerId(customerId).build();
+        }).collect(Collectors.toList());
+
+        return orderDomainList;
     }
 }

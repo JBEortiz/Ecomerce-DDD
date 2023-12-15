@@ -52,8 +52,15 @@ public class OrderApplicationServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrderById(Long id) {
+    public Order getOrderById(Long id) throws JsonProcessingException{
         OrderId orderId = new OrderId(id);
-        return orderService.findOrderById(orderId);
+        Order order = orderService.findOrderById(orderId);
+        sqsProducerMessage.sendGetByIdOrderMessage(order);
+        return order;
+    }
+
+    @Override
+    public List<Order> getAll() {
+        return orderService.findAll();
     }
 }
